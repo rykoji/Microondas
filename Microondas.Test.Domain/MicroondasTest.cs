@@ -46,4 +46,22 @@ public class MicroondasTest
         Assert.Throws<Exception>(() => microondas.SelecionarPotencia(potenciaForaDoIntervalo));
 
     }
+
+
+    [Fact]
+    public async Task Start_SemTempoDefinido()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        await Assert.ThrowsAsync<Exception>(() => microondas.Start());
+    }
+
+    [Fact]
+    public async Task Start_SemPotenciaDefinida()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        microondas.AdicionarTempo(1);
+        await microondas.Start();
+
+        Assert.Equal(10, microondas.PowerLevel);
+    }
 }
