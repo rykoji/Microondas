@@ -4,7 +4,7 @@ namespace Microondas.Domain;
 public class Microondas
 {
 
-    public int Seconds { get; private set; }
+    public int Seconds { get; private set; } = DEFAULT_TIMER_LEVEL;
 
     public int PowerLevel { get; private set; } = DEFAULT_POWER_LEVEL;
 
@@ -55,4 +55,5 @@ public class Microondas
     public void Stop() => _cts?.Cancel();
 
     private static int DEFAULT_POWER_LEVEL => 10;
+    private static int DEFAULT_TIMER_LEVEL => 30;
 }
