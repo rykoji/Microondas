@@ -24,4 +24,26 @@ public class MicroondasTest
 
     }
 
+    [Fact]
+    public void SelecionarPotencia_ValorDentroTempoLimite()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+
+        microondas.SelecionarPotencia(1);
+
+        Assert.Equal(1, microondas.PowerLevel);
+    }
+
+
+    [Theory]
+    [InlineData(17)]
+    [InlineData(47)]
+    [InlineData(-1)]
+    [InlineData(0)]
+    public void SelecionarPotencia_ForaLimite(int potenciaForaDoIntervalo)
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        Assert.Throws<Exception>(() => microondas.SelecionarPotencia(potenciaForaDoIntervalo));
+
+    }
 }
