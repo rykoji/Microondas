@@ -2,9 +2,8 @@
 
 
 var microondas = new Microondas.Domain.Microondas();
-microondas.AdicionarTempo(1);
-microondas.OnTick += () => Console.WriteLine("aaa");
-microondas.OnFinished += () => Console.WriteLine("bbb");
+microondas.AdicionarTempo(5);
+microondas.SelecionarPotencia(3);
+microondas.OnTick += () => Console.Write(new string('.', microondas.PowerLevel) + " ");
+microondas.OnFinished += () => Console.Write("Aquecimento concluido");
 await microondas.Start();
-
-Console.WriteLine(microondas.PowerLevel);
