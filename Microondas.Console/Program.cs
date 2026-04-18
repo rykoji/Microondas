@@ -1,9 +1,27 @@
-﻿Console.WriteLine("Hello, World!");
+﻿var microondas = new Microondas.Domain.Microondas();
+microondas.OnTick += () => {
+    //Console.Write(new string('.', microondas.PowerLevel) + " ");
+    Console.WriteLine(microondas.EstaAquecendo);
+};
+microondas.OnFinished += () =>
+{
+    //Console.Write("Aquecimento concluido");
+    Console.WriteLine(microondas.EstaAquecendo);
+};
 
 
-var microondas = new Microondas.Domain.Microondas();
-microondas.AdicionarTempo(5);
+
+microondas.AdicionarTempo(6);
 microondas.SelecionarPotencia(3);
-microondas.OnTick += () => Console.Write(new string('.', microondas.PowerLevel) + " ");
-microondas.OnFinished += () => Console.Write("Aquecimento concluido");
+
+
+
+microondas.Start();
+Thread.Sleep(3000);
+microondas.Stop();
+Console.WriteLine(microondas.EstaAquecendo);
+
+
 await microondas.Start();
+
+

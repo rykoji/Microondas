@@ -7,6 +7,7 @@ public class Microondas
     public int Seconds { get; private set; } = DEFAULT_TIMER_LEVEL;
 
     public int PowerLevel { get; private set; } = DEFAULT_POWER_LEVEL;
+    public bool EstaAquecendo { get; set; }
 
     private PeriodicTimer? _timer;
     private CancellationTokenSource? _cts;
@@ -34,16 +35,17 @@ public class Microondas
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         try
         {
-            while (await _timer.WaitForNextTickAsync(_cts.Token))
+            while (EstaAquecendo = await _timer.WaitForNextTickAsync(_cts.Token))
             {
                 Seconds--;
                 OnTick?.Invoke();
 
                 if (Seconds <= 0)
                 {
+                    EstaAquecendo = false;
                     OnFinished?.Invoke();
                     Stop();
-                    break;
+
                 }
             }
         }
@@ -52,7 +54,13 @@ public class Microondas
         }
     }
 
-    public void Stop() => _cts?.Cancel();
+
+
+    public void Stop()
+    {
+        _cts?.Cancel();
+        EstaAquecendo = false;
+    }
 
     private static int DEFAULT_POWER_LEVEL => 10;
     private static int DEFAULT_TIMER_LEVEL => 30;
