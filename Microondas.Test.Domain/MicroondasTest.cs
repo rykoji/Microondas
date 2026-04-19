@@ -88,4 +88,33 @@ public class MicroondasTest
         Assert.False(microondas.EstaAquecendo);
         Assert.True(microondas.Seconds > 0);
     }
+
+    [Fact]
+    public async Task Stop_CancelarQuandoPausado()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        microondas.AdicionarTempo(10);
+
+        _ = microondas.Start();
+        await Task.Delay(100);
+
+        microondas.Stop();
+        microondas.Stop();
+
+        Assert.Equal(30, microondas.Seconds);
+        Assert.Equal(10, microondas.PowerLevel);
+    }
+
+    [Fact]
+    public async Task Stop_LimparInformacoes()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        microondas.AdicionarTempo(60);
+        microondas.SelecionarPotencia(1);
+
+        microondas.Stop();
+
+        Assert.Equal(30, microondas.Seconds);
+        Assert.Equal(10, microondas.PowerLevel);
+    }
 }
