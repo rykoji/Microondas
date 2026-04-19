@@ -9,9 +9,11 @@ namespace Microondas.Domain;
 public interface IAquecimento
 {
     public string Nome { get; set; }
-
     public int Seconds { get; set; }
-    
     public int PowerLevel { get; set; }
+    string Alimento { get; set; }
+    string Instrucoes { get; set; }
+    char CaracterAquecimento { get; set; }
+    bool IsCustomize { get; }
 
 }
