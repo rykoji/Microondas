@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Microondas.Console\Microondas.Console.csproj" />
     <ProjectReference Include="..\Microondas.Domain\Microondas.Domain.csproj" />
   </ItemGroup>
 
