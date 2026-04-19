@@ -73,4 +73,19 @@ public class MicroondasTest
         Assert.Equal(30, microondas.Seconds);
         Assert.Equal(10, microondas.PowerLevel);
     }
+
+    [Fact]
+    public async Task Stop_PausaDuranteAquecimento()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        microondas.AdicionarTempo(3);
+
+        _ = microondas.Start();
+        await Task.Delay(100);
+
+        microondas.Stop();
+
+        Assert.False(microondas.EstaAquecendo);
+        Assert.True(microondas.Seconds > 0);
+    }
 }
