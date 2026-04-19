@@ -3,10 +3,14 @@ namespace Microondas.Domain;
 
 public class Microondas
 {
+    public Microondas()
+    {
+        SetDefaultMicroondas();
+    }
 
-    public int Seconds { get; private set; } = DEFAULT_TIMER_LEVEL;
+    public int Seconds { get; private set; }
 
-    public int PowerLevel { get; private set; } = DEFAULT_POWER_LEVEL;
+    public int PowerLevel { get; private set; }
     public bool EstaAquecendo { get; set; }
 
     private PeriodicTimer? _timer;
@@ -54,12 +58,31 @@ public class Microondas
         }
     }
 
+    public async Task StartWithAquecimento(IAquecimento aquecimento)
+    {
+        Seconds = aquecimento.Seconds;
+        PowerLevel = aquecimento.PowerLevel;
+        await Start();
+
+    }
+
 
 
     public void Stop()
     {
+        if (!EstaAquecendo)
+        {
+            SetDefaultMicroondas();
+            return;
+        }
         _cts?.Cancel();
         EstaAquecendo = false;
+    }
+
+    private void SetDefaultMicroondas()
+    {
+        Seconds = DEFAULT_TIMER_LEVEL;
+        PowerLevel = DEFAULT_POWER_LEVEL;
     }
 
     private static int DEFAULT_POWER_LEVEL => 10;
