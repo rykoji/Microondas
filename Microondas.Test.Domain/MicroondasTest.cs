@@ -64,4 +64,13 @@ public class MicroondasTest
 
         Assert.Equal(10, microondas.PowerLevel);
     }
+    
+    [Fact]
+    public void Start_InicioRapido()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+
+        Assert.Equal(30, microondas.Seconds);
+        Assert.Equal(10, microondas.PowerLevel);
+    }
 }
