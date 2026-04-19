@@ -117,4 +117,26 @@ public class MicroondasTest
         Assert.Equal(30, microondas.Seconds);
         Assert.Equal(10, microondas.PowerLevel);
     }
+    [Theory]
+    [InlineData("Pipoca", 180, 7)]
+    [InlineData("Leite", 300, 5)]
+    [InlineData("Carne", 840, 4)]
+    [InlineData("Frango", 480, 7)]
+    [InlineData("Feijao", 480, 9)]
+    public void ProgramasPreDefinidos_DevemTerValoresCorretos(string nome, int tempoEsperado, int potenciaEsperada)
+    {
+        var programas = new Dictionary<string, Microondas.Domain.IAquecimento>
+        {
+            { "Pipoca", new Microondas.Console.PipocaAquecimento() },
+            { "Leite", new Microondas.Console.LeiteAquecimento() },
+            { "Carne", new Microondas.Console.CarneAquecimento() },
+            { "Frango", new Microondas.Console.FrangoAquecimento() },
+            { "Feijao", new Microondas.Console.FeijaoAquecimento() }
+        };
+
+        var programa = programas[nome];
+
+        Assert.Equal(tempoEsperado, programa.Seconds);
+        Assert.Equal(potenciaEsperada, programa.PowerLevel);
+    }
 }
