@@ -1,4 +1,6 @@
-﻿namespace Microondas.Domain.Services;
+﻿using Microondas.Domain.Entities;
+
+namespace Microondas.Domain.Services;
 
 public class AquecimentoValidator
 {

@@ -1,4 +1,4 @@
-﻿namespace Microondas.Domain
+﻿namespace Microondas.Domain.Entities
 {
     public class AquecimentoCustomizado : IAquecimento
     {

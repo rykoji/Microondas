@@ -1,5 +1,9 @@
 using Microondas.Domain;
+using Microondas.Domain.Entities;
 using Microondas.Domain.Services;
+using Microondas.Infrastructure.Data;
+using Microondas.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Microondas.Test.Domain;
 
@@ -297,7 +301,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_CamposObrigatorios_NomeVazio()
     {
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "",
             Alimento = "Arroz",
@@ -315,7 +319,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_CamposObrigatorios_AlimentoVazio()
     {
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "Arroz",
             Alimento = "",
@@ -333,7 +337,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_CaractereNaoPodeSerPonto()
     {
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "Arroz",
             Alimento = "Arroz branco",
@@ -353,7 +357,7 @@ public class MicroondasTest
     {
         var programaExistente = new Microondas.Console.PipocaAquecimento();
 
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "Novo",
             Alimento = "Algo",
@@ -371,7 +375,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_InstrucoesOpcional()
     {
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "Arroz",
             Alimento = "Arroz branco",
@@ -391,7 +395,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_PotenciaForaDoLimite()
     {
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "Arroz",
             Alimento = "Arroz branco",
@@ -409,7 +413,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_TempoZero()
     {
-        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
             Nome = "Arroz",
             Alimento = "Arroz branco",
@@ -424,5 +428,32 @@ public class MicroondasTest
         Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
     }
 
+    [Fact]
+    public async Task CadastrarProgramaCustomizado_Sucesso()
+    {
+        var options = new DbContextOptionsBuilder<MicroondasDbContext>()
+            .UseInMemoryDatabase("TestDb")
+            .Options;
+
+        using var context = new MicroondasDbContext(options);
+        var repository = new AquecimentoSqlRepository(context);
+        var service = new AquecimentoService(repository, new List<IAquecimento>());
+
+        var customizado = new AquecimentoCustomizado
+        {
+            Nome = "Arroz",
+            Alimento = "Arroz branco",
+            Seconds = 300,
+            PowerLevel = 8,
+            CaracterAquecimento = '*',
+            Instrucoes = ""
+        };
+
+        await service.CadastrarAsync(customizado);
+
+        var resultado = await repository.ObterPorNomeAsync("Arroz");
+        Assert.NotNull(resultado);
+        Assert.Equal("Arroz", resultado.Nome);
+    }
 
 }
