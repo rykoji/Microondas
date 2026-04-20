@@ -13,6 +13,8 @@ public class Microondas
     public int PowerLevel { get; private set; }
     public bool EstaAquecendo { get; set; }
 
+    public bool _usandoProgramaPreDefinido = false;
+
     private PeriodicTimer? _timer;
     private CancellationTokenSource? _cts;
     public event Action? OnTick;
@@ -37,6 +39,9 @@ public class Microondas
 
         if (EstaAquecendo)
         {
+            if (_usandoProgramaPreDefinido)
+                throw new Exception("Não é permitido acrescentar tempo em programas pré-definidos");
+
             Seconds += 30;
             return;
         }
@@ -71,6 +76,7 @@ public class Microondas
 
     public async Task StartWithAquecimento(IAquecimento aquecimento)
     {
+        _usandoProgramaPreDefinido = !aquecimento.IsCustomize;
         Seconds = aquecimento.Seconds;
         PowerLevel = aquecimento.PowerLevel;
         await Start();
