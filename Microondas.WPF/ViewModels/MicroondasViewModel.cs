@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -12,6 +13,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
 {
     private readonly Domain.Microondas _microondas;
     private readonly List<IAquecimento> _programas;
+    private ObservableCollection<IAquecimento> _programasCustomizados = new();
 
     private string _tempoInputText = "";
     private string _potenciaInputText = "";
@@ -64,6 +66,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
         TeclaNumericaCommand = new RelayCommand<string>(TeclaNumericaPressionada);
         SelecionarCampoCommand = new RelayCommand<string>(SelecionarCampo);
         LimparCampoCommand = new RelayCommand(LimparCampo);
+        ExcluirCustomizadoCommand = new RelayCommand<string>(ExcluirCustomizado);
     }
 
     public string TempoFormatado
@@ -140,6 +143,12 @@ public class MicroondasViewModel : INotifyPropertyChanged
         set { _novoCaracter = value; OnPropertyChanged(); }
     }
 
+    public ObservableCollection<IAquecimento> ProgramasCustomizados
+    {
+        get => _programasCustomizados;
+        set { _programasCustomizados = value; OnPropertyChanged(); }
+    }
+
     public ICommand IniciarCommand { get; }
     public ICommand PararCommand { get; }
     public ICommand SelecionarProgramaCommand { get; }
@@ -147,6 +156,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
     public ICommand TeclaNumericaCommand { get; }
     public ICommand SelecionarCampoCommand { get; }
     public ICommand LimparCampoCommand { get; }
+    public ICommand ExcluirCustomizadoCommand { get; }
 
     private bool _estaPausado = false;
 
@@ -308,6 +318,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
         };
 
         _programas.Add(novoAquecimento);
+        ProgramasCustomizados.Add(novoAquecimento);
 
         NovoNome = "";
         NovoAlimento = "";
@@ -316,6 +327,19 @@ public class MicroondasViewModel : INotifyPropertyChanged
         NovoCaracter = "";
 
         Instrucoes = $"Programa '{novoAquecimento.Nome}' salvo com sucesso!";
+    }
+
+    private void ExcluirCustomizado(string? nome)
+    {
+        if (nome == null) return;
+
+        var programa = ProgramasCustomizados.FirstOrDefault(p => p.Nome == nome);
+        if (programa != null)
+        {
+            ProgramasCustomizados.Remove(programa);
+            _programas.Remove(programa);
+            Instrucoes = $"Programa '{nome}' excluído com sucesso!";
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
