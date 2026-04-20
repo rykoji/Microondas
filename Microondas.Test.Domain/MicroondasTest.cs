@@ -162,6 +162,22 @@ public class MicroondasTest
     }
 
     [Fact]
+    public async Task StartWithAquecimento_NaoPermitirAcrescimoEmPreDefinido()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        var pipoca = new Microondas.Console.PipocaAquecimento();
+    
+        _ = microondas.StartWithAquecimento(pipoca);
+        await Task.Delay(100);
+    
+        var tempoAntes = microondas.Seconds;
+        
+        Assert.ThrowsAsync<Exception>(() => microondas.Start());
+    
+        microondas.Stop();
+    }
+
+    [Fact]
     public async Task StartWithAquecimento_DeveCarregarValoresDoPrograma()
     {
         var microondas = new Microondas.Domain.Microondas();
