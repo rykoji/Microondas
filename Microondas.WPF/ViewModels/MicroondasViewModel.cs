@@ -13,12 +13,12 @@ public class MicroondasViewModel : INotifyPropertyChanged
     private readonly Domain.Microondas _microondas;
     private readonly List<IAquecimento> _programas;
 
-    private int _tempoInput = 30;
-    private int _potenciaInput = 10;
+    private string _tempoInputText = "";
+    private string _potenciaInputText = "";
+    private string _campoAtivo = "tempo";
     private string _animacaoTexto = "";
     private string _instrucoes = "Selecione um programa ou configure manualmente.";
 
-    // Campos para aquecimento customizado
     private string _novoNome = "";
     private string _novoAlimento = "";
     private string _novoTempo = "";
@@ -61,9 +61,11 @@ public class MicroondasViewModel : INotifyPropertyChanged
         PararCommand = new RelayCommand(Parar);
         SelecionarProgramaCommand = new RelayCommand<string>(SelecionarPrograma);
         SalvarCustomizadoCommand = new RelayCommand(SalvarCustomizado);
+        TeclaNumericaCommand = new RelayCommand<string>(TeclaNumericaPressionada);
+        SelecionarCampoCommand = new RelayCommand<string>(SelecionarCampo);
+        LimparCampoCommand = new RelayCommand(LimparCampo);
     }
 
-    // Propriedades de Binding
     public string TempoFormatado
     {
         get
@@ -76,16 +78,22 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     public int PowerLevel => _microondas.PowerLevel;
 
-    public int TempoInput
+    public string TempoInputText
     {
-        get => _tempoInput;
-        set { _tempoInput = value; OnPropertyChanged(); }
+        get => _tempoInputText;
+        set { _tempoInputText = value; OnPropertyChanged(); }
     }
 
-    public int PotenciaInput
+    public string PotenciaInputText
     {
-        get => _potenciaInput;
-        set { _potenciaInput = value; OnPropertyChanged(); }
+        get => _potenciaInputText;
+        set { _potenciaInputText = value; OnPropertyChanged(); }
+    }
+
+    public string CampoAtivo
+    {
+        get => _campoAtivo;
+        set { _campoAtivo = value; OnPropertyChanged(); }
     }
 
     public string AnimacaoTexto
@@ -102,7 +110,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     public bool EstaAquecendo => _microondas.EstaAquecendo;
 
-    // Propriedades para aquecimento customizado
     public string NovoNome
     {
         get => _novoNome;
@@ -133,18 +140,82 @@ public class MicroondasViewModel : INotifyPropertyChanged
         set { _novoCaracter = value; OnPropertyChanged(); }
     }
 
-    // Commands
     public ICommand IniciarCommand { get; }
     public ICommand PararCommand { get; }
     public ICommand SelecionarProgramaCommand { get; }
     public ICommand SalvarCustomizadoCommand { get; }
+    public ICommand TeclaNumericaCommand { get; }
+    public ICommand SelecionarCampoCommand { get; }
+    public ICommand LimparCampoCommand { get; }
+
+    private bool _estaPausado = false;
+
+    private void TeclaNumericaPressionada(string? tecla)
+    {
+        if (tecla == null) return;
+
+        if (_campoAtivo == "tempo")
+        {
+            if (_tempoInputText.Length < 3)
+                TempoInputText += tecla;
+        }
+        else
+        {
+            if (_potenciaInputText.Length < 2)
+                PotenciaInputText += tecla;
+        }
+    }
+
+    private void SelecionarCampo(string? campo)
+    {
+        if (campo == null) return;
+        
+        if (campo == "alternar" || campo == CampoAtivo)
+        {
+            CampoAtivo = CampoAtivo == "tempo" ? "potencia" : "tempo";
+        }
+        else
+        {
+            CampoAtivo = campo;
+        }
+    }
+
+    private void LimparCampo()
+    {
+        if (_campoAtivo == "tempo")
+            TempoInputText = "";
+        else
+            PotenciaInputText = "";
+    }
+
+    private int GetTempoInput()
+    {
+        if (string.IsNullOrEmpty(_tempoInputText))
+            return 30;
+        return int.TryParse(_tempoInputText, out int tempo) ? tempo : 30;
+    }
+
+    private int GetPotenciaInput()
+    {
+        if (string.IsNullOrEmpty(_potenciaInputText))
+            return 10;
+        return int.TryParse(_potenciaInputText, out int potencia) ? potencia : 10;
+    }
 
     private async void Iniciar()
     {
         try
         {
-            _microondas.AdicionarTempo(TempoInput);
-            _microondas.SelecionarPotencia(PotenciaInput);
+            if (!_microondas.EstaAquecendo)
+            {
+                if (!_estaPausado)
+                {
+                    _microondas.AdicionarTempo(GetTempoInput());
+                    _microondas.SelecionarPotencia(GetPotenciaInput());
+                }
+                _estaPausado = false;
+            }
+            
             Instrucoes = "Aquecendo...";
             await _microondas.Start();
         }
@@ -156,9 +227,18 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     private void Parar()
     {
+        if (_microondas.EstaAquecendo)
+        {
+            _estaPausado = true;
+        }
+        else
+        {
+            _estaPausado = false;
+        }
+        
         _microondas.Stop();
         AnimacaoTexto = "";
-        Instrucoes = "Aquecimento interrompido.";
+        Instrucoes = _estaPausado ? "Aquecimento pausado." : "Aquecimento interrompido.";
         OnPropertyChanged(nameof(TempoFormatado));
     }
 
@@ -185,7 +265,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     private void SalvarCustomizado()
     {
-        // Validações
         if (string.IsNullOrWhiteSpace(NovoNome))
         {
             Instrucoes = "Erro: Nome é obrigatório.";
@@ -210,7 +289,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
             return;
         }
 
-        // Verificar se caracter já existe
         var caracterExistente = _programas.Any(p => p.CaracterAquecimento == NovoCaracter[0]);
         if (caracterExistente)
         {
@@ -218,7 +296,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
             return;
         }
 
-        // Criar novo aquecimento customizado
         var novoAquecimento = new AquecimentoCustomizado
         {
             Nome = NovoNome,
@@ -231,7 +308,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
         _programas.Add(novoAquecimento);
 
-        // Limpar campos
         NovoNome = "";
         NovoAlimento = "";
         NovoTempo = "";
@@ -241,7 +317,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
         Instrucoes = $"Programa '{novoAquecimento.Nome}' salvo com sucesso!";
     }
 
-    // INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null)

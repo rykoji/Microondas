@@ -40,6 +40,29 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="BotaoTeclado" TargetType="Button">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Background" Value="#4A4A4D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#007ACC"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="15">
@@ -53,13 +76,11 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Título -->
         <TextBlock Grid.Row="0" Text="MICROONDAS"
                    FontSize="22" FontWeight="Bold"
                    Foreground="White" HorizontalAlignment="Center"
                    Margin="0,0,0,10"/>
 
-        <!-- Display -->
         <Border Grid.Row="1" Background="#1E1E1E"
                 BorderBrush="#007ACC" BorderThickness="3"
                 CornerRadius="8" Padding="15">
@@ -92,35 +113,125 @@
             </Grid>
         </Border>
 
-        <!-- Controles -->
         <Grid Grid.Row="2" Margin="0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
+            
             <StackPanel Grid.Column="0" Margin="5">
-                <TextBlock Text="Tempo (1-120s)" Foreground="White"
-                           HorizontalAlignment="Center" FontSize="12"/>
-                <Slider Minimum="1" Maximum="120"
-                        Value="{Binding TempoInput}"
-                        TickFrequency="10"/>
-                <TextBlock Text="{Binding TempoInput, StringFormat={}{0}s}"
-                           Foreground="#00FF00" HorizontalAlignment="Center"/>
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                        <TextBlock Text="Tempo (1-120s)" Foreground="White"
+                                   HorizontalAlignment="Center" FontSize="11"/>
+                        <Border Background="#1E1E1E" BorderThickness="2" CornerRadius="3" Padding="5"
+                                BorderBrush="{Binding CampoAtivo, Converter={x:Null}, FallbackValue=#007ACC}"
+                                Cursor="Hand">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                              Command="{Binding SelecionarCampoCommand}"
+                                              CommandParameter="tempo"/>
+                            </Border.InputBindings>
+                            <TextBlock Text="{Binding TempoInputText, TargetNullValue='--'}"
+                                       FontSize="20" FontFamily="Consolas"
+                                       Foreground="#00FF00" HorizontalAlignment="Center"
+                                       MinWidth="50" TextAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="segundos" Foreground="Gray"
+                                   HorizontalAlignment="Center" FontSize="9"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                        <TextBlock Text="Potência (1-10)" Foreground="White"
+                                   HorizontalAlignment="Center" FontSize="11"/>
+                        <Border Background="#1E1E1E" BorderThickness="2" CornerRadius="3" Padding="5"
+                                BorderBrush="{Binding CampoAtivo, Converter={x:Null}, FallbackValue=#555}"
+                                Cursor="Hand">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                              Command="{Binding SelecionarCampoCommand}"
+                                              CommandParameter="potencia"/>
+                            </Border.InputBindings>
+                            <TextBlock Text="{Binding PotenciaInputText, TargetNullValue='10'}"
+                                       FontSize="20" FontFamily="Consolas"
+                                       Foreground="#00FF00" HorizontalAlignment="Center"
+                                       MinWidth="50" TextAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="nível" Foreground="Gray"
+                                   HorizontalAlignment="Center" FontSize="9"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Foreground="#FFD700" HorizontalAlignment="Center" FontSize="10" Margin="0,5,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="► Digitando: TEMPO"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CampoAtivo}" Value="potencia">
+                                    <Setter Property="Text" Value="► Digitando: POTÊNCIA"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Margin="5">
-                <TextBlock Text="Potência (1-10)" Foreground="White"
-                           HorizontalAlignment="Center" FontSize="12"/>
-                <Slider Minimum="1" Maximum="10"
-                        Value="{Binding PotenciaInput}"
-                        TickFrequency="1" IsSnapToTickEnabled="True"/>
-                <TextBlock Text="{Binding PotenciaInput}"
-                           Foreground="#00FF00" HorizontalAlignment="Center"/>
-            </StackPanel>
+            <Border Grid.Column="1" Background="#3E3E42" CornerRadius="5" Padding="5" Margin="5,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Teclado" Foreground="White" HorizontalAlignment="Center" 
+                               FontSize="10" Margin="0,0,0,5"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Row="0" Grid.Column="0" Content="1" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="1"/>
+                        <Button Grid.Row="0" Grid.Column="1" Content="2" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="2"/>
+                        <Button Grid.Row="0" Grid.Column="2" Content="3" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="3"/>
+
+                        <Button Grid.Row="1" Grid.Column="0" Content="4" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="4"/>
+                        <Button Grid.Row="1" Grid.Column="1" Content="5" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="5"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="6" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="6"/>
+
+                        <Button Grid.Row="2" Grid.Column="0" Content="7" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="7"/>
+                        <Button Grid.Row="2" Grid.Column="1" Content="8" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="8"/>
+                        <Button Grid.Row="2" Grid.Column="2" Content="9" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="9"/>
+
+                        <Button Grid.Row="3" Grid.Column="0" Content="C" Style="{StaticResource BotaoTeclado}"
+                                Background="#DC3545" Command="{Binding LimparCampoCommand}"/>
+                        <Button Grid.Row="3" Grid.Column="1" Content="0" Style="{StaticResource BotaoTeclado}"
+                                Command="{Binding TeclaNumericaCommand}" CommandParameter="0"/>
+                        <Button Grid.Row="3" Grid.Column="2" Content="►" Style="{StaticResource BotaoTeclado}"
+                                Background="#007ACC" FontSize="14"
+                                Command="{Binding SelecionarCampoCommand}" 
+                                CommandParameter="alternar" ToolTip="Alternar campo"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Grid>
 
-        <!-- Programas -->
         <GroupBox Grid.Row="3" Header="Programas Pré-definidos"
                   Foreground="White" BorderBrush="#007ACC" Margin="0,5">
             <WrapPanel HorizontalAlignment="Center">
@@ -142,7 +253,6 @@
             </WrapPanel>
         </GroupBox>
 
-        <!-- Botões -->
         <StackPanel Grid.Row="4" Orientation="Horizontal"
                     HorizontalAlignment="Center" Margin="0,10">
             <Button Content="INICIAR" Style="{StaticResource BotaoAcao}"
@@ -153,7 +263,6 @@
                     Command="{Binding PararCommand}"/>
         </StackPanel>
 
-        <!-- Aquecimento Customizado -->
         <GroupBox Grid.Row="5" Header="Novo Programa Customizado"
                   Foreground="White" BorderBrush="#007ACC" Margin="0,5">
             <Grid Margin="5">
@@ -205,7 +314,6 @@
             </Grid>
         </GroupBox>
 
-        <!-- Instruções -->
         <Border Grid.Row="6" Background="#3E3E42"
                 CornerRadius="5" Padding="10" Margin="0,5,0,0">
             <TextBlock Text="{Binding Instrucoes}"

@@ -63,9 +63,8 @@ public class Microondas
                 if (Seconds <= 0)
                 {
                     EstaAquecendo = false;
+                    _cts?.Cancel();
                     OnFinished?.Invoke();
-                    Stop();
-
                 }
             }
         }
