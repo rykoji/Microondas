@@ -188,7 +188,7 @@ public class MicroondasTest
         var programasExistentes = new List<IAquecimento>();
         var validator = new AquecimentoValidator(programasExistentes);
 
-        Assert.Throws<Exception>(() => validator.Validar(customizado));
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public class MicroondasTest
         var programasExistentes = new List<IAquecimento>();
         var validator = new AquecimentoValidator(programasExistentes);
 
-        Assert.Throws<Exception>(() => validator.Validar(customizado));
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
     }
 
     [Fact]
@@ -230,7 +230,7 @@ public class MicroondasTest
         var programasExistentes = new List<IAquecimento> { programaExistente };
         var validator = new AquecimentoValidator(programasExistentes);
 
-        Assert.Throws<Exception>(() => validator.Validar(customizado));
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
     }
 
     [Fact]
@@ -252,5 +252,143 @@ public class MicroondasTest
         var exception = Record.Exception(() => validator.Validar(customizado));
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void AquecimentoCustomizado_ProgramaPreDefinidoNaoEhCustomizado()
+    {
+        var pipoca = new Microondas.Console.PipocaAquecimento();
+        Assert.False(pipoca.IsCustomize);
+    }
+
+    [Fact]
+    public void AquecimentoValidator_CamposObrigatorios_NomeVazio()
+    {
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "",
+            Alimento = "Arroz",
+            Seconds = 300,
+            PowerLevel = 8,
+            CaracterAquecimento = '*'
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento>();
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
+    [Fact]
+    public void AquecimentoValidator_CamposObrigatorios_AlimentoVazio()
+    {
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "Arroz",
+            Alimento = "",
+            Seconds = 300,
+            PowerLevel = 8,
+            CaracterAquecimento = '*'
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento>();
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
+    [Fact]
+    public void AquecimentoValidator_CaractereNaoPodeSerPonto()
+    {
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "Arroz",
+            Alimento = "Arroz branco",
+            Seconds = 300,
+            PowerLevel = 8,
+            CaracterAquecimento = '.'
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento>();
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
+    [Fact]
+    public void AquecimentoValidator_CaractereNaoPodeRepetir()
+    {
+        var programaExistente = new Microondas.Console.PipocaAquecimento();
+
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "Novo",
+            Alimento = "Algo",
+            Seconds = 60,
+            PowerLevel = 5,
+            CaracterAquecimento = 'P'
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento> { programaExistente };
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
+    [Fact]
+    public void AquecimentoValidator_InstrucoesOpcional()
+    {
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "Arroz",
+            Alimento = "Arroz branco",
+            Seconds = 300,
+            PowerLevel = 8,
+            CaracterAquecimento = '*',
+            Instrucoes = null
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento>();
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        var exception = Record.Exception(() => validator.Validar(customizado));
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AquecimentoValidator_PotenciaForaDoLimite()
+    {
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "Arroz",
+            Alimento = "Arroz branco",
+            Seconds = 300,
+            PowerLevel = 15,
+            CaracterAquecimento = '*'
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento>();
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
+    [Fact]
+    public void AquecimentoValidator_TempoZero()
+    {
+        var customizado = new Microondas.Domain.AquecimentoCustomizado
+        {
+            Nome = "Arroz",
+            Alimento = "Arroz branco",
+            Seconds = 0,
+            PowerLevel = 8,
+            CaracterAquecimento = '*'
+        };
+
+        var programasExistentes = new List<Microondas.Domain.IAquecimento>();
+        var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
+
+        Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
 
 }
