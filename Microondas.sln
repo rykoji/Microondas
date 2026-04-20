@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microondas.Console", "Micro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microondas.Infraestructure", "Microondas.Infraestructure\Microondas.Infraestructure.csproj", "{B9A2AA82-3EDB-4B2F-97E3-089980118F91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microondas.WPF", "Microondas.WPF\Microondas.WPF.csproj", "{9F1D6F8D-7C57-4119-945B-4A207A62C6E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{D8DC0918-7FF2-4904-A25B-86A3C78092F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8DC0918-7FF2-4904-A25B-86A3C78092F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8DC0918-7FF2-4904-A25B-86A3C78092F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F1D6F8D-7C57-4119-945B-4A207A62C6E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F1D6F8D-7C57-4119-945B-4A207A62C6E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F1D6F8D-7C57-4119-945B-4A207A62C6E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F1D6F8D-7C57-4119-945B-4A207A62C6E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
