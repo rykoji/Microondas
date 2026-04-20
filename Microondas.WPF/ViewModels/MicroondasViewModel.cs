@@ -29,7 +29,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     public MicroondasViewModel()
     {
-        _microondas = new Domain.Microondas();
+        _microondas = Domain.Microondas.Criar();
 
         _programas = new List<IAquecimento>
         {

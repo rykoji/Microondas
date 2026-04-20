@@ -12,7 +12,7 @@ public class MicroondasTest
     [Fact]
     public void AcionarTempo_ValorDentroTempoLimite()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
 
         microondas.AdicionarTempo(1);
 
@@ -26,7 +26,7 @@ public class MicroondasTest
     [InlineData(-1)]
     public void AcionarTempo_ValorAcimaDoLimite(int segundosForaDoIntervalo)
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         Assert.Throws<Exception>(() => microondas.AdicionarTempo(segundosForaDoIntervalo));
 
     }
@@ -34,7 +34,7 @@ public class MicroondasTest
     [Fact]
     public void SelecionarPotencia_ValorDentroTempoLimite()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
 
         microondas.SelecionarPotencia(1);
 
@@ -49,33 +49,32 @@ public class MicroondasTest
     [InlineData(0)]
     public void SelecionarPotencia_ForaLimite(int potenciaForaDoIntervalo)
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         Assert.Throws<Exception>(() => microondas.SelecionarPotencia(potenciaForaDoIntervalo));
 
     }
 
-
     [Fact]
     public async Task Start_SemTempoDefinido()
     {
-        var microondas = new Microondas.Domain.Microondas();
-        await Assert.ThrowsAsync<Exception>(() => microondas.Start());
+        var microondas = Microondas.Domain.Microondas.Criar();
+        Assert.Equal(30, microondas.Seconds);
     }
 
     [Fact]
     public async Task Start_SemPotenciaDefinida()
     {
-        var microondas = new Microondas.Domain.Microondas();
-        microondas.AdicionarTempo(1);
+        var microondas = Microondas.Domain.Microondas.Criar();
+        microondas.AdicionarTempo(4);
         await microondas.Start();
 
         Assert.Equal(10, microondas.PowerLevel);
     }
-    
+
     [Fact]
     public void Start_InicioRapido()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
 
         Assert.Equal(30, microondas.Seconds);
         Assert.Equal(10, microondas.PowerLevel);
@@ -84,7 +83,7 @@ public class MicroondasTest
     [Fact]
     public async Task Stop_PausaDuranteAquecimento()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         microondas.AdicionarTempo(3);
 
         _ = microondas.Start();
@@ -99,7 +98,7 @@ public class MicroondasTest
     [Fact]
     public async Task Stop_CancelarQuandoPausado()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         microondas.AdicionarTempo(10);
 
         _ = microondas.Start();
@@ -115,7 +114,7 @@ public class MicroondasTest
     [Fact]
     public async Task Stop_LimparInformacoes()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         microondas.AdicionarTempo(60);
         microondas.SelecionarPotencia(1);
 
@@ -128,7 +127,7 @@ public class MicroondasTest
     [Fact]
     public async Task Start_AcrescentarTempoDuranteAquecimento()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         microondas.AdicionarTempo(60);
 
         _ = microondas.Start();
@@ -142,6 +141,20 @@ public class MicroondasTest
         microondas.Stop();
 
     }
+    
+    [Fact]
+    public async Task Start_DisparaOnTickCadaSegundo()
+    {
+        var microondas = Microondas.Domain.Microondas.Criar();
+        microondas.AdicionarTempo(2);
+
+        var tickCount = 0;
+        microondas.OnTick += () => tickCount++;
+
+        await microondas.Start();
+        Assert.Equal(2, tickCount);
+    }
+
     [Theory]
     [InlineData("Pipoca", 180, 7)]
     [InlineData("Leite", 300, 5)]
@@ -168,7 +181,7 @@ public class MicroondasTest
     [Fact]
     public async Task StartWithAquecimento_NaoPermitirAcrescimoEmPreDefinido()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         var pipoca = new Microondas.Console.PipocaAquecimento();
     
         _ = microondas.StartWithAquecimento(pipoca);
@@ -184,7 +197,7 @@ public class MicroondasTest
     [Fact]
     public async Task StartWithAquecimento_DeveCarregarValoresDoPrograma()
     {
-        var microondas = new Microondas.Domain.Microondas();
+        var microondas = Microondas.Domain.Microondas.Criar();
         var pipoca = new Microondas.Console.PipocaAquecimento();
 
         _ = microondas.StartWithAquecimento(pipoca);

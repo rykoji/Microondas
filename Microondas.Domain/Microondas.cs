@@ -1,23 +1,94 @@
 ﻿
 namespace Microondas.Domain;
 
+public interface IMicroondasTimer
+{
+    int RemainingSeconds { get; }
+    event Action? OnTick;
+    event Action? OnFinished;
+    Task StartAsync(int durationSeconds);
+    void Stop();
+}
+
+public class MicroondasTimer : IMicroondasTimer
+{
+    private PeriodicTimer? _timer;
+    private CancellationTokenSource? _cts;
+    
+    public int RemainingSeconds { get; private set; }
+    public event Action? OnTick;
+    public event Action? OnFinished;
+
+    public async Task StartAsync(int durationSeconds)
+    {
+        RemainingSeconds = durationSeconds;
+        _cts = new CancellationTokenSource();
+        _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+        try
+        {
+            while (await _timer.WaitForNextTickAsync(_cts.Token))
+            {
+                RemainingSeconds--;
+                OnTick?.Invoke();
+
+                if (RemainingSeconds <= 0)
+                {
+                    _cts?.Cancel();
+                    OnFinished?.Invoke();
+                    break;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    public void Stop()
+    {
+        _cts?.Cancel();
+    }
+}
+
 public class Microondas
 {
-    public Microondas()
+    private readonly IMicroondasTimer _timerProvider;
+
+    private Microondas(IMicroondasTimer timerProvider)
     {
+        _timerProvider = timerProvider;
+        _timerProvider.OnTick += () => 
+        {
+            Seconds = _timerProvider.RemainingSeconds;
+            OnTick?.Invoke();
+        };
+        _timerProvider.OnFinished += () =>
+        {
+            EstaAquecendo = false;
+            OnFinished?.Invoke();
+        };
         SetDefaultMicroondas();
+    }
+
+    public static Microondas Criar()
+    {
+        return new Microondas(new MicroondasTimer());
+    }
+
+    public static Microondas Criar(IMicroondasTimer timer)
+    {
+        return new Microondas(timer);
     }
 
     public int Seconds { get; private set; }
 
     public int PowerLevel { get; private set; }
-    public bool EstaAquecendo { get; set; }
+    public bool EstaAquecendo { get; private set; }
     public char CaracterAquecimento { get; private set; } = '.';
 
-    public bool _usandoProgramaPreDefinido = false;
+    private bool _usandoProgramaPreDefinido = false;
 
-    private PeriodicTimer? _timer;
-    private CancellationTokenSource? _cts;
     public event Action? OnTick;
     public event Action? OnFinished;
 
@@ -43,7 +114,6 @@ public class Microondas
 
     public async Task Start()
     {
-
         if (EstaAquecendo)
         {
             if (_usandoProgramaPreDefinido)
@@ -56,28 +126,7 @@ public class Microondas
         if (Seconds <= 0) throw new Exception("Valor de tempo invalido");
 
         EstaAquecendo = true;
-
-        _cts = new CancellationTokenSource();
-        _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-
-        try
-        {
-            while (EstaAquecendo = await _timer.WaitForNextTickAsync(_cts.Token))
-            {
-                Seconds--;
-                OnTick?.Invoke();
-
-                if (Seconds <= 0)
-                {
-                    EstaAquecendo = false;
-                    _cts?.Cancel();
-                    OnFinished?.Invoke();
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
+        await _timerProvider.StartAsync(Seconds);
     }
 
     public async Task StartWithAquecimento(IAquecimento aquecimento)
@@ -98,7 +147,7 @@ public class Microondas
             SetDefaultMicroondas();
             return;
         }
-        _cts?.Cancel();
+        _timerProvider.Stop();
         EstaAquecendo = false;
     }
 

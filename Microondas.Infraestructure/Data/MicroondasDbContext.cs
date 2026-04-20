@@ -6,11 +6,8 @@ using Microondas.Domain.Entities;
 
 namespace Microondas.Infrastructure.Data;
 
-public class MicroondasDbContext : DbContext
+public class MicroondasDbContext(DbContextOptions<MicroondasDbContext> options) : DbContext(options)
 {
-    public MicroondasDbContext(DbContextOptions<MicroondasDbContext> options)
-        : base(options) { }
-
     public DbSet<AquecimentoCustomizado> ProgramasCustomizados { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
