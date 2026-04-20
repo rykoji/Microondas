@@ -34,9 +34,18 @@ public class Microondas
 
     public async Task Start()
     {
+
+        if (EstaAquecendo)
+        {
+            Seconds += 30;
+            return;
+        }
+
         if (Seconds <= 0) throw new Exception("Valor de tempo invalido");
+
         _cts = new CancellationTokenSource();
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
         try
         {
             while (EstaAquecendo = await _timer.WaitForNextTickAsync(_cts.Token))
