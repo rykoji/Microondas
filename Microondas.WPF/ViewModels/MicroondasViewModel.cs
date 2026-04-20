@@ -52,7 +52,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                AnimacaoTexto = "PRONTO!";
+                AnimacaoTexto = "Aquecimento concluído!!";
                 Instrucoes = "Aquecimento concluído!";
             });
         };
@@ -212,6 +212,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
                 {
                     _microondas.AdicionarTempo(GetTempoInput());
                     _microondas.SelecionarPotencia(GetPotenciaInput());
+                    _microondas.ResetarCaracterAquecimento();
                 }
                 _estaPausado = false;
             }
@@ -258,7 +259,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
     {
         if (_microondas.EstaAquecendo)
         {
-            var caracteres = new string('.', _microondas.PowerLevel * 3);
+            var caracteres = new string(_microondas.CaracterAquecimento, _microondas.PowerLevel * 3);
             AnimacaoTexto = $"~ {caracteres} ~";
         }
     }

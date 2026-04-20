@@ -12,6 +12,7 @@ public class Microondas
 
     public int PowerLevel { get; private set; }
     public bool EstaAquecendo { get; set; }
+    public char CaracterAquecimento { get; private set; } = '.';
 
     public bool _usandoProgramaPreDefinido = false;
 
@@ -32,6 +33,12 @@ public class Microondas
         if (powerLevel < 1 || powerLevel > 10) throw new Exception("Valor de potencia fora do limite permitido");
 
         PowerLevel = powerLevel;
+    }
+
+    public void ResetarCaracterAquecimento()
+    {
+        CaracterAquecimento = '.';
+        _usandoProgramaPreDefinido = false;
     }
 
     public async Task Start()
@@ -78,8 +85,8 @@ public class Microondas
         _usandoProgramaPreDefinido = !aquecimento.IsCustomize;
         Seconds = aquecimento.Seconds;
         PowerLevel = aquecimento.PowerLevel;
+        CaracterAquecimento = aquecimento.CaracterAquecimento;
         await Start();
-
     }
 
 
@@ -99,6 +106,7 @@ public class Microondas
     {
         Seconds = DEFAULT_TIMER_LEVEL;
         PowerLevel = DEFAULT_POWER_LEVEL;
+        CaracterAquecimento = '.';
     }
 
     private static int DEFAULT_POWER_LEVEL => 10;
