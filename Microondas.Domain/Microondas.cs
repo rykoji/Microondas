@@ -43,6 +43,8 @@ public class Microondas
 
         if (Seconds <= 0) throw new Exception("Valor de tempo invalido");
 
+        EstaAquecendo = true;
+
         _cts = new CancellationTokenSource();
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
 

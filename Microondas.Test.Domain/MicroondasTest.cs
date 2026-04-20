@@ -120,6 +120,24 @@ public class MicroondasTest
         Assert.Equal(30, microondas.Seconds);
         Assert.Equal(10, microondas.PowerLevel);
     }
+
+    [Fact]
+    public async Task Start_AcrescentarTempoDuranteAquecimento()
+    {
+        var microondas = new Microondas.Domain.Microondas();
+        microondas.AdicionarTempo(60);
+
+        _ = microondas.Start();
+        await Task.Delay(100);
+
+        var tempoAntes = microondas.Seconds;
+        _ = microondas.Start();
+
+        Assert.Equal(tempoAntes + 30, microondas.Seconds);
+
+        microondas.Stop();
+
+    }
     [Theory]
     [InlineData("Pipoca", 180, 7)]
     [InlineData("Leite", 300, 5)]
