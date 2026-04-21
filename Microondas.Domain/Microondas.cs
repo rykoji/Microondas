@@ -77,7 +77,7 @@ public class MicroondasTimer : IMicroondasTimer
     public void Reset()
     {
         Stop();
-        RemainingSeconds = 30;
+        RemainingSeconds = 0;
     }
 }
 
@@ -164,6 +164,7 @@ public class Microondas
 
     public async Task StartWithAquecimento(IAquecimento aquecimento)
     {
+        _timerProvider.Reset();
         usandoProgramaPreDefinido = !aquecimento.IsCustomize;
         Seconds = aquecimento.Seconds;
         PowerLevel = aquecimento.PowerLevel;
