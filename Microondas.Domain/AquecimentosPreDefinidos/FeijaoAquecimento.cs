@@ -4,7 +4,7 @@ namespace Microondas.Console
 {
     public class FeijaoAquecimento : IAquecimento
     {
-        public string Nome { get; init; } = "Feijão";
+        public string Nome { get; init; } = "Feijao";
         public int Seconds { get; init; } = 480;
         public int PowerLevel { get; init; } = 9;
         public string Alimento { get; init; } = "Feijão congelado";

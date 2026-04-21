@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Microondas.Domain;
 using Microondas.Domain.Entities;
 using Microondas.Console;
+using Microondas.Domain.Exceptions;
 
 namespace Microondas.WPF.ViewModels;
 
@@ -255,16 +256,29 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     private async void SelecionarPrograma(string? nome)
     {
-        if (nome == null) return;
+        if (nome is null) return;
 
         var programa = _programas.FirstOrDefault(p => p.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase));
-        if (programa != null)
+        if (programa is null) return;
+
+        if (_microondas.usandoProgramaPreDefinido)
         {
-            Instrucoes = programa.Instrucoes;
+            Instrucoes = "Não é permitido acrescentar tempo em programas pré - definidos";
+            return;
+        }
+        ;
+
+        Instrucoes = programa.Instrucoes;
+        try
+        {
             await _microondas.StartWithAquecimento(programa);
         }
-    }
+        catch (DomainException e)
+        {
+            Instrucoes = e.Message;
+        }
 
+    }
     private void AtualizarAnimacao()
     {
         if (_microondas.EstaAquecendo)

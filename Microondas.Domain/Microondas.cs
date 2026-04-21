@@ -1,4 +1,6 @@
 ﻿
+using Microondas.Domain.Exceptions;
+
 namespace Microondas.Domain;
 
 public interface IMicroondasTimer
@@ -87,21 +89,21 @@ public class Microondas
     public bool EstaAquecendo { get; private set; }
     public char CaracterAquecimento { get; private set; } = '.';
 
-    private bool _usandoProgramaPreDefinido = false;
+    public bool usandoProgramaPreDefinido = false;
 
     public event Action? OnTick;
     public event Action? OnFinished;
 
     public void AdicionarTempo(int seconds)
     {
-        if (seconds < 1 || seconds > 120) throw new Exception("Valor do tempo fora do limite permitido");
+        if (seconds < 1 || seconds > 120) throw new DomainException("Valor do tempo fora do limite permitido");
 
         Seconds = seconds;
     }
 
     public void SelecionarPotencia(int powerLevel)
     {
-        if (powerLevel < 1 || powerLevel > 10) throw new Exception("Valor de potencia fora do limite permitido");
+        if (powerLevel < 1 || powerLevel > 10) throw new DomainException("Valor de potencia fora do limite permitido");
 
         PowerLevel = powerLevel;
     }
@@ -109,21 +111,21 @@ public class Microondas
     public void ResetarCaracterAquecimento()
     {
         CaracterAquecimento = '.';
-        _usandoProgramaPreDefinido = false;
+        usandoProgramaPreDefinido = false;
     }
 
     public async Task Start()
     {
         if (EstaAquecendo)
         {
-            if (_usandoProgramaPreDefinido)
-                throw new Exception("Não é permitido acrescentar tempo em programas pré-definidos");
+            if (usandoProgramaPreDefinido)
+                throw new DomainException("Não é permitido acrescentar tempo em programas pré-definidos");
 
             Seconds += 30;
             return;
         }
 
-        if (Seconds <= 0) throw new Exception("Valor de tempo invalido");
+        if (Seconds <= 0) throw new DomainException("Valor de tempo invalido");
 
         EstaAquecendo = true;
         await _timerProvider.StartAsync(Seconds);
@@ -131,7 +133,7 @@ public class Microondas
 
     public async Task StartWithAquecimento(IAquecimento aquecimento)
     {
-        _usandoProgramaPreDefinido = !aquecimento.IsCustomize;
+        usandoProgramaPreDefinido = !aquecimento.IsCustomize;
         Seconds = aquecimento.Seconds;
         PowerLevel = aquecimento.PowerLevel;
         CaracterAquecimento = aquecimento.CaracterAquecimento;
