@@ -158,8 +158,10 @@ public class Microondas
         Seconds = DEFAULT_TIMER_LEVEL;
         PowerLevel = DEFAULT_POWER_LEVEL;
         CaracterAquecimento = '.';
+        usandoProgramaPreDefinido = DEFAULT_WARNING;
     }
 
     private static int DEFAULT_POWER_LEVEL => 10;
     private static int DEFAULT_TIMER_LEVEL => 30;
+    private static bool DEFAULT_WARNING => false;
 }
