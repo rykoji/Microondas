@@ -9,7 +9,10 @@ public interface IMicroondasTimer
     event Action? OnTick;
     event Action? OnFinished;
     Task StartAsync(int durationSeconds);
+    Task AddTime(int seconds);
     void Stop();
+    Task Continue();
+    void Reset();
 }
 
 public class MicroondasTimer : IMicroondasTimer
@@ -21,6 +24,10 @@ public class MicroondasTimer : IMicroondasTimer
     public event Action? OnTick;
     public event Action? OnFinished;
 
+    private bool IsRunngin { get; set; }
+
+
+
     public async Task StartAsync(int durationSeconds)
     {
         RemainingSeconds = durationSeconds;
@@ -29,7 +36,7 @@ public class MicroondasTimer : IMicroondasTimer
 
         try
         {
-            while (await _timer.WaitForNextTickAsync(_cts.Token))
+            while (IsRunngin = await _timer.WaitForNextTickAsync(_cts.Token))
             {
                 RemainingSeconds--;
                 OnTick?.Invoke();
@@ -50,6 +57,27 @@ public class MicroondasTimer : IMicroondasTimer
     public void Stop()
     {
         _cts?.Cancel();
+    }
+
+    public async Task AddTime(int seconds)
+    {
+        if (RemainingSeconds + seconds >= 120)
+        {
+            RemainingSeconds = 120;
+            return;
+        }
+            RemainingSeconds += seconds;
+    }
+
+    public async Task Continue()
+    {
+        await StartAsync(RemainingSeconds);
+    }
+
+    public void Reset()
+    {
+        Stop();
+        RemainingSeconds = 30;
     }
 }
 
@@ -121,14 +149,17 @@ public class Microondas
             if (usandoProgramaPreDefinido)
                 throw new DomainException("Não é permitido acrescentar tempo em programas pré-definidos");
 
-            Seconds += 30;
+            await _timerProvider.AddTime(30);
             return;
         }
 
         if (Seconds <= 0) throw new DomainException("Valor de tempo invalido");
 
         EstaAquecendo = true;
-        await _timerProvider.StartAsync(Seconds);
+        if (_timerProvider.RemainingSeconds <= 0)
+            await _timerProvider.StartAsync(Seconds);
+        else
+            await _timerProvider.Continue();
     }
 
     public async Task StartWithAquecimento(IAquecimento aquecimento)
@@ -147,6 +178,7 @@ public class Microondas
         if (!EstaAquecendo)
         {
             SetDefaultMicroondas();
+            _timerProvider.Reset();
             return;
         }
         _timerProvider.Stop();

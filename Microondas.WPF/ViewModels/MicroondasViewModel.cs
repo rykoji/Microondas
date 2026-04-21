@@ -193,9 +193,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
 
     private void LimparCampo()
     {
-        if (_campoAtivo == "tempo")
             TempoInputText = "";
-        else
             PotenciaInputText = "";
     }
 
@@ -227,7 +225,6 @@ public class MicroondasViewModel : INotifyPropertyChanged
                 }
                 _estaPausado = false;
             }
-            
             Instrucoes = "Aquecendo...";
             await _microondas.Start();
         }
@@ -246,6 +243,8 @@ public class MicroondasViewModel : INotifyPropertyChanged
         else
         {
             _estaPausado = false;
+            TempoInputText = "";
+            PotenciaInputText = "";
         }
         
         _microondas.Stop();
