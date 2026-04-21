@@ -58,6 +58,7 @@ public class MicroondasTest
     public async Task Start_SemTempoDefinido()
     {
         var microondas = Microondas.Domain.Microondas.Criar();
+        //await Assert.ThrowsAsync<Exception>(() => microondas.Start());
         Assert.Equal(30, microondas.Seconds);
     }
 
@@ -439,6 +440,93 @@ public class MicroondasTest
         var validator = new Microondas.Domain.Services.AquecimentoValidator(programasExistentes);
 
         Assert.Throws<ArgumentException>(() => validator.Validar(customizado));
+    }
+
+    [Fact]
+    public void Criar_SemParametro_DeveCriarComTimerPadrao()
+    {
+        var microondas = Microondas.Domain.Microondas.Criar();
+
+        Assert.NotNull(microondas);
+        Assert.Equal(30, microondas.Seconds);
+        Assert.Equal(10, microondas.PowerLevel);
+    }
+
+    [Fact]
+    public void ResetarCaracterAquecimento_DeveVoltarParaPontoELimparFlag()
+    {
+        var microondas = Microondas.Domain.Microondas.Criar();
+        
+        microondas.ResetarCaracterAquecimento();
+
+        Assert.Equal('.', microondas.CaracterAquecimento);
+    }
+
+    [Fact]
+    public async Task Start_DisparaOnFinishedAoConcluir()
+    {
+        var microondas = Microondas.Domain.Microondas.Criar();
+        microondas.AdicionarTempo(1);
+
+        var finishedCalled = false;
+        microondas.OnFinished += () => finishedCalled = true;
+
+        await microondas.Start();
+
+        Assert.True(finishedCalled);
+        Assert.False(microondas.EstaAquecendo);
+    }
+
+    [Fact]
+    public async Task StartWithAquecimento_PermitirAcrescimoEmCustomizado()
+    {
+        var microondas = Microondas.Domain.Microondas.Criar();
+        var customizado = new AquecimentoCustomizado
+        {
+            Nome = "Teste",
+            Alimento = "Teste",
+            Seconds = 60,
+            PowerLevel = 5,
+            CaracterAquecimento = '*'
+        };
+
+        _ = microondas.StartWithAquecimento(customizado);
+        await Task.Delay(100);
+
+        var tempoAntes = microondas.Seconds;
+        _ = microondas.Start();
+
+        Assert.Equal(tempoAntes + 30, microondas.Seconds);
+
+        microondas.Stop();
+    }
+
+    [Fact]
+    public async Task StartWithAquecimento_DeveUsarCaracterDoPrograma()
+    {
+        var microondas = Microondas.Domain.Microondas.Criar();
+        var pipoca = new Microondas.Console.PipocaAquecimento();
+
+        _ = microondas.StartWithAquecimento(pipoca);
+        await Task.Delay(100);
+
+        Assert.Equal(pipoca.CaracterAquecimento, microondas.CaracterAquecimento);
+
+        microondas.Stop();
+    }
+
+    [Fact]
+    public async Task MicroondasTimer_Stop_DeveCancelarTimer()
+    {
+        var timer = new MicroondasTimer();
+        
+        _ = timer.StartAsync(10);
+        await Task.Delay(100);
+
+        timer.Stop();
+
+        await Task.Delay(100);
+        Assert.True(timer.RemainingSeconds > 0);
     }
 
     [Fact]
