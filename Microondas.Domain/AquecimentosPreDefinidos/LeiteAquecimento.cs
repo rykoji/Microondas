@@ -1,11 +1,6 @@
 ﻿using Microondas.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Microondas.Console;
+namespace Microondas.Domain;
 
 public class LeiteAquecimento : IAquecimento
 {

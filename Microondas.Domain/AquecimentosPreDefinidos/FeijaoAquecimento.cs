@@ -1,6 +1,6 @@
 ﻿using Microondas.Domain;
 
-namespace Microondas.Console
+namespace Microondas.Domain
 {
     public class FeijaoAquecimento : IAquecimento
     {
