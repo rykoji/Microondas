@@ -10,4 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Microondas.Domain\Microondas.Domain.csproj" />
+    <ProjectReference Include="..\Microondas.Infraestructure\Microondas.Infraestructure.csproj" />
+  </ItemGroup>
+
 </Project>

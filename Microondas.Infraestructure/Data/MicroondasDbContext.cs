@@ -14,8 +14,9 @@ public class MicroondasDbContext(DbContextOptions<MicroondasDbContext> options) 
     {
         modelBuilder.Entity<AquecimentoCustomizado>(entity =>
         {
-            entity.HasKey(e => e.Nome);
-            entity.Property(e => e.Nome).HasMaxLength(100);
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Nome).IsUnique();
+            entity.Property(e => e.Nome).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Alimento).HasMaxLength(200);
             entity.Property(e => e.Instrucoes).HasMaxLength(500).IsRequired(false);
             entity.Property(e => e.CaracterAquecimento).HasMaxLength(1);
