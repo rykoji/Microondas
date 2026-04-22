@@ -3,6 +3,7 @@ using Microondas.Domain.Services;
 using Microondas.Infrastructure.Data;
 using Microondas.Infrastructure.Repositories;
 using Microondas.WebApplication.Middleware;
+using Microondas.WebApplication.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -58,8 +59,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+var encryptedConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+var connectionKey = builder.Configuration.GetConnectionString("EncryptionKey")!;
+var connectionString = CryptographyService.Decrypt(encryptedConnectionString, connectionKey);
+
 builder.Services.AddDbContext<MicroondasDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
     
 builder.Services.AddScoped<IAquecimentoRepository, AquecimentoSqlRepository>();
 builder.Services.AddScoped<AquecimentoService>(sp =>
