@@ -154,12 +154,15 @@
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <TextBlock Grid.Row="1"
-                           Text="{Binding AnimacaoTexto}"
-                           FontSize="18" FontFamily="Consolas"
-                           Foreground="#FFD700"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Hidden"
+                              ScrollChanged="AnimacaoScroll_ScrollChanged">
+                    <TextBlock Text="{Binding AnimacaoTexto}"
+                               FontSize="18" FontFamily="Consolas"
+                               Foreground="#FFD700"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"/>
+                </ScrollViewer>
             </Grid>
         </Border>
 
