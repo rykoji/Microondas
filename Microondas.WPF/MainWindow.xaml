@@ -78,7 +78,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -238,25 +237,78 @@
             </Border>
         </Grid>
 
-        <GroupBox Grid.Row="3" Header="Programas Pré-definidos"
+        <GroupBox Grid.Row="3" Header="Programas"
                   Foreground="White" BorderBrush="#007ACC" Margin="0,5">
-            <WrapPanel HorizontalAlignment="Center">
-                <Button Content="Pipoca" Style="{StaticResource BotaoPrograma}"
-                        Command="{Binding SelecionarProgramaCommand}"
-                        CommandParameter="Pipoca"/>
-                <Button Content="Leite" Style="{StaticResource BotaoPrograma}"
-                        Command="{Binding SelecionarProgramaCommand}"
-                        CommandParameter="Leite"/>
-                <Button Content="Carne" Style="{StaticResource BotaoPrograma}"
-                        Command="{Binding SelecionarProgramaCommand}"
-                        CommandParameter="Carne"/>
-                <Button Content="Frango" Style="{StaticResource BotaoPrograma}"
-                        Command="{Binding SelecionarProgramaCommand}"
-                        CommandParameter="Frango"/>
-                <Button Content="Feijão" Style="{StaticResource BotaoPrograma}"
-                        Command="{Binding SelecionarProgramaCommand}"
-                        CommandParameter="Feijao"/>
-            </WrapPanel>
+            <ItemsControl ItemsSource="{Binding TodosProgramas}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border CornerRadius="5" Margin="5" Padding="8" BorderThickness="1" Cursor="Hand">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                              Command="{Binding DataContext.SelecionarProgramaCommand,
+                                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                              CommandParameter="{Binding Nome}"/>
+                            </Border.InputBindings>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="#3E3E42"/>
+                                    <Setter Property="BorderBrush" Value="#007ACC"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCustomize}" Value="True">
+                                            <Setter Property="BorderBrush" Value="#28A745"/>
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#4A4A4D"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Nome}" Foreground="White"
+                                           FontWeight="Bold" HorizontalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontStyle" Value="Normal"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCustomize}" Value="True">
+                                                    <Setter Property="FontStyle" Value="Italic"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Foreground="Gray" FontSize="9" HorizontalAlignment="Center">
+                                    <Run Text="{Binding Seconds, StringFormat={}{0}s}"/>
+                                    <Run Text=" | P:"/>
+                                    <Run Text="{Binding PowerLevel}"/>
+                                </TextBlock>
+                                <Button Content="✕" Width="30" Height="25" FontSize="10"
+                                        Margin="0,5,0,0" HorizontalAlignment="Center"
+                                        Background="#DC3545" Foreground="White" Cursor="Hand"
+                                        Command="{Binding DataContext.ExcluirCustomizadoCommand,
+                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding Nome}" ToolTip="Excluir">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCustomize}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </GroupBox>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal"
@@ -321,46 +373,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="6" Header="Programas Customizados"
-                  Foreground="White" BorderBrush="#28A745" Margin="0,5">
-            <ItemsControl ItemsSource="{Binding ProgramasCustomizados}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel HorizontalAlignment="Center"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="#3E3E42" BorderBrush="#28A745" BorderThickness="1"
-                                CornerRadius="5" Margin="5" Padding="8">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Nome}" Foreground="White" 
-                                           FontWeight="Bold" HorizontalAlignment="Center"/>
-                                <TextBlock Foreground="Gray" FontSize="9" HorizontalAlignment="Center">
-                                    <Run Text="{Binding Seconds, StringFormat={}{0}s}"/>
-                                    <Run Text=" | P:"/>
-                                    <Run Text="{Binding PowerLevel}"/>
-                                </TextBlock>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                                    <Button Content="▶" Width="30" Height="25" FontSize="10"
-                                            Background="#28A745" Foreground="White" Cursor="Hand"
-                                            Command="{Binding DataContext.SelecionarProgramaCommand, 
-                                                RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding Nome}" ToolTip="Iniciar"/>
-                                    <Button Content="✕" Width="30" Height="25" FontSize="10" Margin="5,0,0,0"
-                                            Background="#DC3545" Foreground="White" Cursor="Hand"
-                                            Command="{Binding DataContext.ExcluirCustomizadoCommand, 
-                                                RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding Nome}" ToolTip="Excluir"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </GroupBox>
-
-        <Border Grid.Row="7" Background="#3E3E42"
+        <Border Grid.Row="6" Background="#3E3E42"
                 CornerRadius="5" Padding="10" Margin="0,5,0,0">
             <TextBlock Text="{Binding Instrucoes}"
                        Foreground="#CCCCCC" TextWrapping="Wrap"

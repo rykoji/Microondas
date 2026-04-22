@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Input;
 using Microondas.Domain;
 using Microondas.Domain.Entities;
-using Microondas.Console;
 using Microondas.Domain.Exceptions;
 
 namespace Microondas.WPF.ViewModels;
@@ -14,7 +13,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
 {
     private readonly Domain.Microondas _microondas;
     private readonly List<IAquecimento> _programas;
-    private ObservableCollection<IAquecimento> _programasCustomizados = new();
+    private ObservableCollection<IAquecimento> _todosProgramas = new();
 
     private string _tempoInputText = "";
     private string _potenciaInputText = "";
@@ -40,6 +39,8 @@ public class MicroondasViewModel : INotifyPropertyChanged
             new FrangoAquecimento(),
             new FeijaoAquecimento()
         };
+
+        _todosProgramas = new ObservableCollection<IAquecimento>(_programas);
 
         _microondas.OnTick += () =>
         {
@@ -144,10 +145,10 @@ public class MicroondasViewModel : INotifyPropertyChanged
         set { _novoCaracter = value; OnPropertyChanged(); }
     }
 
-    public ObservableCollection<IAquecimento> ProgramasCustomizados
+    public ObservableCollection<IAquecimento> TodosProgramas
     {
-        get => _programasCustomizados;
-        set { _programasCustomizados = value; OnPropertyChanged(); }
+        get => _todosProgramas;
+        set { _todosProgramas = value; OnPropertyChanged(); }
     }
 
     public ICommand IniciarCommand { get; }
@@ -331,7 +332,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
         };
 
         _programas.Add(novoAquecimento);
-        ProgramasCustomizados.Add(novoAquecimento);
+        TodosProgramas.Add(novoAquecimento);
 
         NovoNome = "";
         NovoAlimento = "";
@@ -346,10 +347,10 @@ public class MicroondasViewModel : INotifyPropertyChanged
     {
         if (nome == null) return;
 
-        var programa = ProgramasCustomizados.FirstOrDefault(p => p.Nome == nome);
+        var programa = TodosProgramas.FirstOrDefault(p => p.Nome == nome && p.IsCustomize);
         if (programa != null)
         {
-            ProgramasCustomizados.Remove(programa);
+            TodosProgramas.Remove(programa);
             _programas.Remove(programa);
             Instrucoes = $"Programa '{nome}' excluído com sucesso!";
         }
