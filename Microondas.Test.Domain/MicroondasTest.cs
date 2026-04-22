@@ -166,11 +166,11 @@ public class MicroondasTest
     {
         var programas = new Dictionary<string, Microondas.Domain.IAquecimento>
         {
-            { "Pipoca", new Microondas.Console.PipocaAquecimento() },
-            { "Leite", new Microondas.Console.LeiteAquecimento() },
-            { "Carne", new Microondas.Console.CarneAquecimento() },
-            { "Frango", new Microondas.Console.FrangoAquecimento() },
-            { "Feijao", new Microondas.Console.FeijaoAquecimento() }
+            { "Pipoca", new Microondas.Domain.PipocaAquecimento() },
+            { "Leite", new Microondas.Domain.LeiteAquecimento() },
+            { "Carne", new Microondas.Domain.CarneAquecimento() },
+            { "Frango", new Microondas.Domain.FrangoAquecimento() },
+            { "Feijao", new Microondas.Domain.FeijaoAquecimento() }
         };
 
         var programa = programas[nome];
@@ -183,7 +183,7 @@ public class MicroondasTest
     public async Task StartWithAquecimento_NaoPermitirAcrescimoEmPreDefinido()
     {
         var microondas = Microondas.Domain.Microondas.Criar();
-        var pipoca = new Microondas.Console.PipocaAquecimento();
+        var pipoca = new Microondas.Domain.PipocaAquecimento();
     
         _ = microondas.StartWithAquecimento(pipoca);
         await Task.Delay(100);
@@ -199,7 +199,7 @@ public class MicroondasTest
     public async Task StartWithAquecimento_DeveCarregarValoresDoPrograma()
     {
         var microondas = Microondas.Domain.Microondas.Criar();
-        var pipoca = new Microondas.Console.PipocaAquecimento();
+        var pipoca = new Microondas.Domain.PipocaAquecimento();
 
         _ = microondas.StartWithAquecimento(pipoca);
         await Task.Delay(100);
@@ -308,7 +308,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoCustomizado_ProgramaPreDefinidoNaoEhCustomizado()
     {
-        var pipoca = new Microondas.Console.PipocaAquecimento();
+        var pipoca = new Microondas.Domain.PipocaAquecimento();
         Assert.False(pipoca.IsCustomize);
     }
 
@@ -369,7 +369,7 @@ public class MicroondasTest
     [Fact]
     public void AquecimentoValidator_CaractereNaoPodeRepetir()
     {
-        var programaExistente = new Microondas.Console.PipocaAquecimento();
+        var programaExistente = new Microondas.Domain.PipocaAquecimento();
 
         var customizado = new Microondas.Domain.Entities.AquecimentoCustomizado
         {
@@ -505,7 +505,7 @@ public class MicroondasTest
     public async Task StartWithAquecimento_DeveUsarCaracterDoPrograma()
     {
         var microondas = Microondas.Domain.Microondas.Criar();
-        var pipoca = new Microondas.Console.PipocaAquecimento();
+        var pipoca = new Microondas.Domain.PipocaAquecimento();
 
         _ = microondas.StartWithAquecimento(pipoca);
         await Task.Delay(100);
