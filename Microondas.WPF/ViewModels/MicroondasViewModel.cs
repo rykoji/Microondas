@@ -146,9 +146,30 @@ public class MicroondasViewModel : INotifyPropertyChanged
         var (sucesso, mensagem) = await _apiService.LoginAsync(_usuario, senha);
         EstaAutenticado = sucesso;
         StatusApi = sucesso ? "Conectado" : mensagem;
-        Instrucoes = sucesso
-            ? "Autenticado. Selecione um programa ou configure manualmente."
-            : $"Falha: {mensagem}";
+
+        if (sucesso)
+        {
+            await CarregarProgramasDoServidorAsync();
+            Instrucoes = "Autenticado. Selecione um programa ou configure manualmente.";
+        }
+        else
+        {
+            Instrucoes = $"Falha: {mensagem}";
+        }
+    }
+
+    private async Task CarregarProgramasDoServidorAsync()
+    {
+        var customizados = await _apiService.ObterProgramasCustomizadosAsync();
+        foreach (var prog in customizados)
+        {
+            var jaExiste = _programas.Any(p => p.Nome.Equals(prog.Nome, StringComparison.OrdinalIgnoreCase));
+            if (!jaExiste)
+            {
+                _programas.Add(prog);
+                TodosProgramas.Add(prog);
+            }
+        }
     }
 
     public string NovoNome
@@ -324,7 +345,7 @@ public class MicroondasViewModel : INotifyPropertyChanged
         }
     }
 
-    private void SalvarCustomizado()
+    private async void SalvarCustomizado()
     {
         if (string.IsNullOrWhiteSpace(NovoNome))
         {
@@ -367,6 +388,16 @@ public class MicroondasViewModel : INotifyPropertyChanged
             Instrucoes = $"Programa customizado: {NovoNome}"
         };
 
+        if (_apiService.EstaAutenticado)
+        {
+            var (sucesso, mensagem) = await _apiService.SalvarProgramaAsync(novoAquecimento);
+            if (!sucesso)
+            {
+                Instrucoes = $"Erro ao salvar na API: {mensagem}";
+                return;
+            }
+        }
+
         _programas.Add(novoAquecimento);
         TodosProgramas.Add(novoAquecimento);
 
@@ -379,17 +410,26 @@ public class MicroondasViewModel : INotifyPropertyChanged
         Instrucoes = $"Programa '{novoAquecimento.Nome}' salvo com sucesso!";
     }
 
-    private void ExcluirCustomizado(string? nome)
+    private async void ExcluirCustomizado(string? nome)
     {
         if (nome == null) return;
 
         var programa = TodosProgramas.FirstOrDefault(p => p.Nome == nome && p.IsCustomize);
-        if (programa != null)
+        if (programa == null) return;
+
+        if (_apiService.EstaAutenticado)
         {
-            TodosProgramas.Remove(programa);
-            _programas.Remove(programa);
-            Instrucoes = $"Programa '{nome}' excluído com sucesso!";
+            var (sucesso, mensagem) = await _apiService.ExcluirProgramaAsync(nome);
+            if (!sucesso)
+            {
+                Instrucoes = $"Erro ao excluir na API: {mensagem}";
+                return;
+            }
         }
+
+        TodosProgramas.Remove(programa);
+        _programas.Remove(programa);
+        Instrucoes = $"Programa '{nome}' excluído com sucesso!";
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
