@@ -1,26 +1,19 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
 using Microondas.WPF.ViewModels;
 
-namespace Microondas.WPF
+namespace Microondas.WPF;
+
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-            DataContext = new MicroondasViewModel();
-        }
+        InitializeComponent();
+        DataContext = new MicroondasViewModel();
+    }
+
+    private void BotaoLogin_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MicroondasViewModel vm)
+            vm.ExecutarLogin(SenhaBox.Password);
     }
 }

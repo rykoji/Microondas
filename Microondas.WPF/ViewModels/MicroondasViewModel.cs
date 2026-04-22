@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Microondas.Domain;
 using Microondas.Domain.Entities;
 using Microondas.Domain.Exceptions;
+using Microondas.WPF.Services;
 
 namespace Microondas.WPF.ViewModels;
 
@@ -13,7 +14,12 @@ public class MicroondasViewModel : INotifyPropertyChanged
 {
     private readonly Domain.Microondas _microondas;
     private readonly List<IAquecimento> _programas;
+    private readonly IApiService _apiService;
     private ObservableCollection<IAquecimento> _todosProgramas = new();
+
+    private string _usuario = "";
+    private string _statusApi = "Desconectado";
+    private bool _estaAutenticado = false;
 
     private string _tempoInputText = "";
     private string _potenciaInputText = "";
@@ -27,8 +33,9 @@ public class MicroondasViewModel : INotifyPropertyChanged
     private string _novaPotencia = "";
     private string _novoCaracter = "";
 
-    public MicroondasViewModel()
+    public MicroondasViewModel(IApiService? apiService = null)
     {
+        _apiService = apiService ?? new ApiService();
         _microondas = Domain.Microondas.Criar();
 
         _programas = new List<IAquecimento>
@@ -114,6 +121,35 @@ public class MicroondasViewModel : INotifyPropertyChanged
     }
 
     public bool EstaAquecendo => _microondas.EstaAquecendo;
+
+    public string Usuario
+    {
+        get => _usuario;
+        set { _usuario = value; OnPropertyChanged(); }
+    }
+
+    public string StatusApi
+    {
+        get => _statusApi;
+        set { _statusApi = value; OnPropertyChanged(); }
+    }
+
+    public bool EstaAutenticado
+    {
+        get => _estaAutenticado;
+        private set { _estaAutenticado = value; OnPropertyChanged(); }
+    }
+
+    public async void ExecutarLogin(string senha)
+    {
+        StatusApi = "Conectando...";
+        var (sucesso, mensagem) = await _apiService.LoginAsync(_usuario, senha);
+        EstaAutenticado = sucesso;
+        StatusApi = sucesso ? "Conectado" : mensagem;
+        Instrucoes = sucesso
+            ? "Autenticado. Selecione um programa ou configure manualmente."
+            : $"Falha: {mensagem}";
+    }
 
     public string NovoNome
     {
