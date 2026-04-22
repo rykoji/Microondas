@@ -150,6 +150,7 @@ public class Microondas
                 throw new DomainException("Não é permitido acrescentar tempo em programas pré-definidos");
 
             await _timerProvider.AddTime(30);
+            Seconds = _timerProvider.RemainingSeconds;
             return;
         }
 

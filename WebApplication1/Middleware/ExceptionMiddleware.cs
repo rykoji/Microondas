@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microondas.WebApplication.Exceptions;
 
@@ -57,7 +58,8 @@ public class ExceptionMiddleware
 
         _logger.LogError(exception, "Erro capturado pelo middleware");
 
-        await response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+        var options = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        await response.WriteAsync(JsonSerializer.Serialize(errorResponse, options));
     }
 
     private void LogToFile(Exception ex)

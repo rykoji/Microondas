@@ -1,5 +1,6 @@
 using Microondas.Domain;
 using Microondas.Domain.Entities;
+using Microondas.Domain.Exceptions;
 using Microondas.Domain.Services;
 using Microondas.Infrastructure.Data;
 using Microondas.Infrastructure.Repositories;
@@ -27,7 +28,7 @@ public class MicroondasTest
     public void AcionarTempo_ValorAcimaDoLimite(int segundosForaDoIntervalo)
     {
         var microondas = Microondas.Domain.Microondas.Criar();
-        Assert.Throws<Exception>(() => microondas.AdicionarTempo(segundosForaDoIntervalo));
+        Assert.Throws<DomainException>(() => microondas.AdicionarTempo(segundosForaDoIntervalo));
 
     }
 
@@ -50,7 +51,7 @@ public class MicroondasTest
     public void SelecionarPotencia_ForaLimite(int potenciaForaDoIntervalo)
     {
         var microondas = Microondas.Domain.Microondas.Criar();
-        Assert.Throws<Exception>(() => microondas.SelecionarPotencia(potenciaForaDoIntervalo));
+        Assert.Throws<DomainException>(() => microondas.SelecionarPotencia(potenciaForaDoIntervalo));
 
     }
 
