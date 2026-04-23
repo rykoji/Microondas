@@ -1,4 +1,4 @@
-﻿var microondas = new Microondas.Domain.Microondas();
+﻿var microondas = Microondas.Domain.Microondas.Criar();
 microondas.OnTick += () => {
     //Console.Write(new string('.', microondas.PowerLevel) + " ");
     Console.WriteLine(microondas.EstaAquecendo);
